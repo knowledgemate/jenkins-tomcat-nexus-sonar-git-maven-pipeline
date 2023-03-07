@@ -70,6 +70,11 @@ sudo cat /opt/nexus/sonatype-work/nexus3/admin.password
 SonarQube:
 sudo apt-get update
 
+sysctl -w vm.max_map_count=262144
+sudo sysctl -w fs.file-max=65536
+ulimit -n 65536
+ulimit -u 4096
+
 sudo apt-get install openjdk-11-jdk -y
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
 wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
@@ -109,14 +114,9 @@ sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube
 vi /opt/sonarqube/bin/linux-x86-64/sonar.sh
 RUN_AS_USER=sonar
 
-cd /opt/sonarqube/bin/linux-x86-64/
+sudo cd /opt/sonarqube/bin/linux-x86-64/
 ./sonar.sh start
 ./sonar.sh status
-
-sysctl -w vm.max_map_count=262144
-sudo sysctl -w fs.file-max=65536
-ulimit -n 65536
-ulimit -u 4096
 
 Port : 9000
 Login to SonarQube  with default administrator username and password is admin.
