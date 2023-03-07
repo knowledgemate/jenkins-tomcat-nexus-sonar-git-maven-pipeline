@@ -1,17 +1,12 @@
 git,tree,maven,java,tomcat intsallation in amazonlinux/centos:
 
-
 sudo amazon-linux-extras install java-openjdk11 -y
 
-yum install git tree maven tomcat tomcat-webapps tomcat-admin-webapps tomcat-docs-webapp tomcat-javadoc -y
+sudo yum install git tree maven tomcat tomcat-webapps tomcat-admin-webapps tomcat-docs-webapp tomcat-javadoc -y
 
-Please edit /usr/share/tomcat/conf/server.xml 
+Tomcat port number change: 
+Please edit /usr/share/tomcat/conf/server.xml
 port number from 8080 to 8090
-
-
-systemctl start tomcat
-
-systemctl enable tomcat
 
 Tomcat credentials: /usr/share/tomcat/conf/tomcat-users.xml
 <role rolename="tomcat"/>
@@ -26,7 +21,9 @@ Tomcat credentials: /usr/share/tomcat/conf/tomcat-users.xml
 <user password="password" roles="manager-gui" username="admin"/>
 <user password="password" roles="admin,admin-script,manager-gui,manager-script,manager-jmx,manager-status" username="admin"/>
 
-Tomcat port number change: /usr/share/tomcat/conf/server.xml
+sudo systemctl start tomcat
+
+sudo systemctl enable tomcat
 --------------------------------------
 Jenkins in amazonlinux /centos:
 
