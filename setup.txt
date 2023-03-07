@@ -45,15 +45,15 @@ Jenkins password location: cat /var/lib/jenkins/secrets/initialAdminPassword
 ---------------------------------------------------------
 Installation of nexus and sonar in Ubuntu --> Nexus 8081 and sonar 9000
 Nexus:
-apt update
+sudo apt update
 
-apt install openjdk-8-jdk git tree maven
+sudo apt install openjdk-8-jdk git tree maven wget unzip -y 
 
-wget https://sonatype-download.global.ssl.fastly.net/repository/downloads-prod-group/3/nexus-3.29.2-02-unix.tar.gz
+sudo wget https://sonatype-download.global.ssl.fastly.net/repository/downloads-prod-group/3/nexus-3.29.2-02-unix.tar.gz
 
-mkdir /opt/nexus
+sudo mkdir /opt/nexus
 
-tar xzf nexus-3.29.2-02-unix.tar.gz -C /opt/nexus --strip-components=1
+sudo tar xzf nexus-3.29.2-02-unix.tar.gz -C /opt/nexus --strip-components=1
 
 vi /opt/nexus/bin/nexus.rc
  run_as_user="root"
@@ -63,56 +63,48 @@ vi /opt/nexus/bin/nexus.vmoptions
 
 sudo /opt/nexus/bin/nexus start
 
-cat /opt/nexus/sonatype-work/nexus3/admin.password
+sudo cat /opt/nexus/sonatype-work/nexus3/admin.password
 
 ----------------------------------------------
 
 SonarQube:
+sudo apt-get update
 
-sysctl -w vm.max_map_count=262144
-sudo sysctl -w fs.file-max=65536
-ulimit -n 65536
-ulimit -u 4096
-apt-get update
-apt-get upgrade -y
-apt-get install wget unzip -y
-apt-get install openjdk-11-jdk -y
-sudo update-alternatives --config java
+sudo apt-get install openjdk-11-jdk -y
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
 wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
-sudo apt-get -y install postgresql postgresql-contrib
+sudo apt-get install postgresql postgresql-contrib -y
 sudo systemctl start postgresql
 systemctl enable postgresql
 sudo passwd postgres
 su - postgres
 
-Create a new user by typing:
-createuser sonar
-Switch to the PostgreSQL shell.
-psql
-Set a password for the newly created user for SonarQube database.
-ALTER USER sonar WITH ENCRYPTED password 'sonar';
-Create a new database for PostgreSQL database by running:
-CREATE DATABASE sonarqube OWNER sonar;
-grant all privileges to sonar user on sonarqube Database.
-grant all privileges on DATABASE sonarqube to sonar;
-Exit from the psql shell:
-\q
-Switch back to the sudo user by running the exit command.
-exit
+> Create a new user by typing:
+   createuser sonar
+> Switch to the PostgreSQL shell.
+   psql
+> Set a password for the newly created user for SonarQube database.
+   ALTER USER sonar WITH ENCRYPTED password 'sonar';
+> Create a new database for PostgreSQL database by running:
+    CREATE DATABASE sonarqube OWNER sonar;
+> grant all privileges to sonar user on sonarqube Database.
+   grant all privileges on DATABASE sonarqube to sonar;
+> Exit from the psql shell:
+   \q
+> Switch back to the sudo user by running the exit command.
+   exit
 
-cd /tmp
 sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.9.1.44547.zip
 sudo unzip sonarqube-8.9.1.44547.zip -d /opt
 sudo mv /opt/sonarqube-8.9.1.44547/ /opt/sonarqube
 sudo groupadd sonar
 sudo useradd -c "user to run SonarQube" -d /opt/sonarqube -g sonar sonar
 sudo chown sonar:sonar /opt/sonarqube -R
+
 vi /opt/sonarqube/conf/sonar.properties
 sonar.jdbc.username=sonar
 sonar.jdbc.password=sonar
 sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube
-
 
 vi /opt/sonarqube/bin/linux-x86-64/sonar.sh
 RUN_AS_USER=sonar
@@ -120,6 +112,11 @@ RUN_AS_USER=sonar
 cd /opt/sonarqube/bin/linux-x86-64/
 ./sonar.sh start
 ./sonar.sh status
+
+sysctl -w vm.max_map_count=262144
+sudo sysctl -w fs.file-max=65536
+ulimit -n 65536
+ulimit -u 4096
 
 Port : 9000
 Login to SonarQube  with default administrator username and password is admin.
