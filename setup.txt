@@ -1,0 +1,128 @@
+git,tree,maven,java,tomcat intsallation in amazonlinux/centos:
+
+
+sudo amazon-linux-extras install java-openjdk11 -y
+
+yum install git tree maven tomcat tomcat-webapps tomcat-admin-webapps tomcat-docs-webapp tomcat-javadoc -y
+
+Please edit /usr/share/tomcat/conf/server.xml 
+port number from 8080 to 8090
+
+
+systemctl start tomcat
+
+systemctl enable tomcat
+
+Tomcat credentials: /usr/share/tomcat/conf/tomcat-users.xml
+<role rolename="tomcat"/>
+<role rolename="admin-script"/>
+<role rolename="manager-script"/>
+<role rolename="manager-gui"/>
+<role rolename="manager-jmx"/>
+<role rolename="manager-status"/>
+<role rolename="manager"/>
+<role rolename="admin"/>
+<user password="password" roles="tomcat" username="admin"/>
+<user password="password" roles="manager-gui" username="admin"/>
+<user password="password" roles="admin,admin-script,manager-gui,manager-script,manager-jmx,manager-status" username="admin"/>
+
+Tomcat port number change: /usr/share/tomcat/conf/server.xml
+--------------------------------------
+Jenkins in amazonlinux /centos:
+
+sudo amazon-linux-extras install java-openjdk11 -y
+
+sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
+
+sudo rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
+
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key 
+
+sudo yum install jenkins -y
+
+sudo systemctl enable jenkins
+
+sudo systemctl start jenkins
+
+Jenkins password location: cat /var/lib/jenkins/secrets/initialAdminPassword
+---------------------------------------------------------
+
+Nexus:
+apt update
+
+apt install openjdk-8-jdk git tree maven
+
+wget https://sonatype-download.global.ssl.fastly.net/repository/downloads-prod-group/3/nexus-3.29.2-02-unix.tar.gz
+
+mkdir /opt/nexus
+
+tar xzf nexus-3.29.2-02-unix.tar.gz -C /opt/nexus --strip-components=1
+
+vi /opt/nexus/bin/nexus.rc
+ run_as_user="root"
+ 
+vi /opt/nexus/bin/nexus.vmoptions
+ change ../sonatype-work to ./sonatype-work
+
+sudo /opt/nexus/bin/nexus start
+
+cat /opt/nexus/sonatype-work/nexus3/admin.password
+
+----------------------------------------------
+
+SonarQube:
+
+sysctl -w vm.max_map_count=262144
+sudo sysctl -w fs.file-max=65536
+ulimit -n 65536
+ulimit -u 4096
+apt-get update
+apt-get upgrade -y
+apt-get install wget unzip -y
+apt-get install openjdk-11-jdk -y
+sudo update-alternatives --config java
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
+wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
+sudo apt-get -y install postgresql postgresql-contrib
+sudo systemctl start postgresql
+systemctl enable postgresql
+sudo passwd postgres
+su - postgres
+
+Create a new user by typing:
+createuser sonar
+Switch to the PostgreSQL shell.
+psql
+Set a password for the newly created user for SonarQube database.
+ALTER USER sonar WITH ENCRYPTED password 'sonar';
+Create a new database for PostgreSQL database by running:
+CREATE DATABASE sonarqube OWNER sonar;
+grant all privileges to sonar user on sonarqube Database.
+grant all privileges on DATABASE sonarqube to sonar;
+Exit from the psql shell:
+\q
+Switch back to the sudo user by running the exit command.
+exit
+
+cd /tmp
+sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.9.1.44547.zip
+sudo unzip sonarqube-8.9.1.44547.zip -d /opt
+sudo mv /opt/sonarqube-8.9.1.44547/ /opt/sonarqube
+sudo groupadd sonar
+sudo useradd -c "user to run SonarQube" -d /opt/sonarqube -g sonar sonar
+sudo chown sonar:sonar /opt/sonarqube -R
+vi /opt/sonarqube/conf/sonar.properties
+sonar.jdbc.username=sonar
+sonar.jdbc.password=sonar
+sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube
+
+
+vi /opt/sonarqube/bin/linux-x86-64/sonar.sh
+RUN_AS_USER=sonar
+
+cd /opt/sonarqube/bin/linux-x86-64/
+./sonar.sh start
+./sonar.sh status
+
+Port : 9000
+Login to SonarQube  with default administrator username and password is admin.
