@@ -1,4 +1,4 @@
-git,tree,maven,java,tomcat intsallation in amazonlinux/centos:
+git,tree,maven,java,tomcat intsallation in amazonlinux:  Please 8080 (Jenkins) 8090 (Tomcat)
 
 sudo amazon-linux-extras install java-openjdk11 -y
 
@@ -43,7 +43,7 @@ sudo systemctl start jenkins
 
 Jenkins password location: cat /var/lib/jenkins/secrets/initialAdminPassword
 ---------------------------------------------------------
-
+Installation of nexus and sonar in Ubuntu --> Nexus 8081 and sonar 9000
 Nexus:
 apt update
 
